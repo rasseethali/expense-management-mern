@@ -26,12 +26,12 @@ export const registerUser = async (name, email, password, monthlyBudget) => {
 
 // User Expense APIs
 export const getUserExpenses = async () => {
-  const res = await api.get('/expenses/my');
+  const res = await api.get('/expenses/');
   return res.data;
 };
 
 export const addExpense = async (expenseData) => {
-  const res = await api.post('/expenses/add', expenseData);
+  const res = await api.post('/expenses/', expenseData);
   return res.data;
 };
 
