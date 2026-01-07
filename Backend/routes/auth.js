@@ -7,10 +7,14 @@ const router = express.Router();
 
 // SIGNUP
 router.post("/register", async (req, res) => {
+  console.log("Signup request:", req.body);
   const { name, email, password, monthlyBudget } = req.body;
 
   const exist = await User.findOne({ email });
-  if (exist) return res.status(400).json("User already exists");
+  if (exist) {
+    console.log("User already exists:", email);
+    return res.status(400).json("User already exists");
+  }
 
   const hashed = await bcrypt.hash(password, 10);
 
@@ -19,24 +23,33 @@ router.post("/register", async (req, res) => {
   const user = new User({ name, email, password: hashed, role, monthlyBudget: monthlyBudget || 0 });
   await user.save();
 
+  console.log("Signup successful for:", email);
   res.json("Signup successful");
 });
 
 // LOGIN
 router.post("/login", async (req, res) => {
+  console.log("Login request:", req.body.email);
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
-  if (!user) return res.status(401).json("User not found");
+  if (!user) {
+    console.log("User not found:", email);
+    return res.status(401).json("User not found");
+  }
 
   const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(401).json("Wrong password");
+  if (!match) {
+    console.log("Wrong password for:", email);
+    return res.status(401).json("Wrong password");
+  }
 
   const token = jwt.sign(
     { id: user._id, role: user.role },
     process.env.JWT_SECRET
   );
 
+  console.log("Login successful for:", email);
   res.json({ token, role: user.role });
 });
 

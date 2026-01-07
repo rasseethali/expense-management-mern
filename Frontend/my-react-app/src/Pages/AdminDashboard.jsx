@@ -6,10 +6,14 @@ export default function AdminDashboard() {
   const [data, setData] = useState([]);
 
   const fetchData = async () => {
-    const res = await axios.get("http://localhost:5000/admin/expenses", {
-      headers: { authorization: getToken() }
-    });
-    setData(res.data);
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/expenses`, {
+        headers: { authorization: getToken() }
+      });
+      setData(res.data);
+    } catch (err) {
+      console.error("Fetch admin data error:", err);
+    }
   };
 
   useEffect(() => {
@@ -17,16 +21,20 @@ export default function AdminDashboard() {
   }, []);
 
   const exportExcel = async () => {
-    const res = await axios.get("http://localhost:5000/admin/export", {
-      headers: { authorization: getToken() },
-      responseType: "blob"
-    });
-    const url = window.URL.createObjectURL(new Blob([res.data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "expenses.xlsx");
-    document.body.appendChild(link);
-    link.click();
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/export`, {
+        headers: { authorization: getToken() },
+        responseType: "blob"
+      });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "expenses.xlsx");
+      document.body.appendChild(link);
+      link.click();
+    } catch (err) {
+      console.error("Export error:", err);
+    }
   };
 
   return (

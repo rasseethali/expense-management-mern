@@ -9,10 +9,14 @@ export default function UserDashboard() {
   const [amount, setAmount] = useState("");
 
   const fetchData = async () => {
-    const res = await axios.get("http://localhost:5000/expense/my", {
-      headers: { authorization: getToken() }
-    });
-    setData(res.data);
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/expense/my`, {
+        headers: { authorization: getToken() }
+      });
+      setData(res.data);
+    } catch (err) {
+      console.error("Fetch data error:", err);
+    }
   };
 
   useEffect(() => {
@@ -20,16 +24,20 @@ export default function UserDashboard() {
   }, []);
 
   const addExpense = async () => {
-    await axios.post("http://localhost:5000/expense/add", {
-      name,
-      category,
-      amount: Number(amount)
-    }, {
-      headers: { authorization: getToken() }
-    });
-    setName("");
-    setAmount("");
-    fetchData();
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/expense/add`, {
+        name,
+        category,
+        amount: Number(amount)
+      }, {
+        headers: { authorization: getToken() }
+      });
+      setName("");
+      setAmount("");
+      fetchData();
+    } catch (err) {
+      console.error("Add expense error:", err);
+    }
   };
 
   return (

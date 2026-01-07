@@ -12,7 +12,7 @@ export default function Signup() {
 
   const signup = async () => {
     try {
-      await axios.post("http://localhost:5000/auth/register", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, {
         name,
         email,
         password,
@@ -20,6 +20,7 @@ export default function Signup() {
       });
       nav("/");
     } catch (err) {
+      console.error("Signup error:", err);
       setError(err.response?.data || "Signup failed");
     }
   };
