@@ -1,6 +1,6 @@
-import axios from "axios";
-import { getToken, logout } from "../auth";
 import { useEffect, useState } from "react";
+import { getToken, logout } from "../auth";
+import { getUserExpenses, addExpense, updateBudget } from "../Services/Api";
 import TargetInput from "../Components/TargetInput";
 
 export default function UserDashboard() {
@@ -13,11 +13,9 @@ export default function UserDashboard() {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/expenses/my`, {
-        headers: { authorization: getToken() }
-      });
-      setData(res.data);
-      setTarget(res.data.monthlyBudget);
+      const data = await getUserExpenses();
+      setData(data);
+      setTarget(data.monthlyBudget);
     } catch (err) {
       console.error("Fetch data error:", err);
     }
@@ -27,16 +25,23 @@ export default function UserDashboard() {
     fetchData();
   }, []);
 
-  const updateBudget = async (newBudget) => {
+  const handleUpdateBudget = async (newBudget) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL}/expenses/budget`, {
-        monthlyBudget: newBudget
-      }, {
-        headers: { authorization: getToken() }
-      });
-      fetchData(); // Refresh data
+      await updateBudget(newBudget);
+      fetchData();
     } catch (err) {
       console.error("Update budget error:", err);
+    }
+  };
+
+  const handleAddExpense = async () => {
+    try {
+      await addExpense({ name, category, amount: Number(amount) });
+      setName("");
+      setAmount("");
+      fetchData();
+    } catch (err) {
+      console.error("Add expense error:", err);
     }
   };
 
@@ -75,7 +80,7 @@ export default function UserDashboard() {
           setLocked={setLocked}
           totalSpent={data.totalSpent}
           balance={data.remaining}
-          onSet={updateBudget}
+          onSet={handleUpdateBudget}
         />
 
         <div className="bg-white p-6 rounded shadow mb-6">
@@ -110,7 +115,7 @@ export default function UserDashboard() {
           />
           <button
             className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-            onClick={addExpense}
+            onClick={handleAddExpense}
           >
             Add Expense
           </button>

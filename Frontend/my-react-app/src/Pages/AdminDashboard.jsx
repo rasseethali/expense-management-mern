@@ -1,16 +1,14 @@
-import axios from "axios";
-import { getToken, logout } from "../auth";
 import { useEffect, useState } from "react";
+import { getToken, logout } from "../auth";
+import { getAllExpenses, exportExpenses } from "../Services/Api";
 
 export default function AdminDashboard() {
   const [data, setData] = useState([]);
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/expenses`, {
-        headers: { authorization: getToken() }
-      });
-      setData(res.data);
+      const data = await getAllExpenses();
+      setData(data);
     } catch (err) {
       console.error("Fetch admin data error:", err);
     }
@@ -22,11 +20,8 @@ export default function AdminDashboard() {
 
   const exportExcel = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/export`, {
-        headers: { authorization: getToken() },
-        responseType: "blob"
-      });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const data = await exportExpenses();
+      const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", "expenses.xlsx");

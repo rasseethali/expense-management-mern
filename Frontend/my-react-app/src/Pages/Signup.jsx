@@ -1,6 +1,6 @@
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { registerUser } from "../Services/Api";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -12,12 +12,7 @@ export default function Signup() {
 
   const signup = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, {
-        name,
-        email,
-        password,
-        monthlyBudget: Number(monthlyBudget) || 0
-      });
+      await registerUser(name, email, password, Number(monthlyBudget) || 0);
       nav("/");
     } catch (err) {
       console.error("Signup error:", err);

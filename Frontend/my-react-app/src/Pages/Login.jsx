@@ -1,6 +1,6 @@
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { loginUser } from "../Services/Api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,14 +10,10 @@ export default function Login() {
 
   const login = async () => {
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        email,
-        password
-      });
-
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
-      nav(res.data.role === "admin" ? "/admin" : "/user");
+      const data = await loginUser(email, password);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      nav(data.role === "admin" ? "/admin" : "/user");
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data || "Login failed");
