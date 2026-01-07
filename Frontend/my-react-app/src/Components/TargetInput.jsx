@@ -1,9 +1,10 @@
-export default function TargetInput({ target, setTarget, locked, setLocked, totalSpent, balance }) {
+export default function TargetInput({ target, setTarget, locked, setLocked, totalSpent, balance, onSet }) {
   const handleSet = () => {
     if (target <= 0) {
       alert("Enter valid target amount");
       return;
     }
+    onSet(target);
     setLocked(true);
   };
 

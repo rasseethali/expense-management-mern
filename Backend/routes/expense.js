@@ -35,4 +35,11 @@ router.get("/my", auth, async (req, res) => {
   res.json({ expenses, totalSpent, remaining, monthlyBudget: user.monthlyBudget });
 });
 
+// UPDATE MONTHLY BUDGET
+router.put("/budget", auth, async (req, res) => {
+  const { monthlyBudget } = req.body;
+  await User.findByIdAndUpdate(req.user.id, { monthlyBudget });
+  res.json("Budget updated");
+});
+
 module.exports = router;

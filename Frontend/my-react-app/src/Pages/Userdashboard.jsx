@@ -1,19 +1,23 @@
 import axios from "axios";
 import { getToken, logout } from "../auth";
 import { useEffect, useState } from "react";
+import TargetInput from "../Components/TargetInput";
 
 export default function UserDashboard() {
   const [data, setData] = useState({ expenses: [], totalSpent: 0, remaining: 0, monthlyBudget: 0 });
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Food");
   const [amount, setAmount] = useState("");
+  const [target, setTarget] = useState(0);
+  const [locked, setLocked] = useState(false);
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/expense/my`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/expenses/my`, {
         headers: { authorization: getToken() }
       });
       setData(res.data);
+      setTarget(res.data.monthlyBudget);
     } catch (err) {
       console.error("Fetch data error:", err);
     }
@@ -23,20 +27,16 @@ export default function UserDashboard() {
     fetchData();
   }, []);
 
-  const addExpense = async () => {
+  const updateBudget = async (newBudget) => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/expense/add`, {
-        name,
-        category,
-        amount: Number(amount)
+      await axios.put(`${import.meta.env.VITE_API_URL}/expenses/budget`, {
+        monthlyBudget: newBudget
       }, {
         headers: { authorization: getToken() }
       });
-      setName("");
-      setAmount("");
-      fetchData();
+      fetchData(); // Refresh data
     } catch (err) {
-      console.error("Add expense error:", err);
+      console.error("Update budget error:", err);
     }
   };
 
@@ -67,6 +67,16 @@ export default function UserDashboard() {
             <p className="text-2xl">₹{data.remaining}</p>
           </div>
         </div>
+
+        <TargetInput
+          target={target}
+          setTarget={setTarget}
+          locked={locked}
+          setLocked={setLocked}
+          totalSpent={data.totalSpent}
+          balance={data.remaining}
+          onSet={updateBudget}
+        />
 
         <div className="bg-white p-6 rounded shadow mb-6">
           <h3 className="text-xl font-semibold mb-4">Add Expense</h3>

@@ -13,7 +13,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/auth", require("./routes/auth"));
-app.use("/expense", require("./routes/expense"));
+app.use("/expenses", require("./routes/expense"));
 app.use("/admin", require("./routes/admin"));
 
 mongoose.connect(process.env.MONGO_URI)
